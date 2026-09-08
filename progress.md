@@ -15,7 +15,7 @@
 - [x] 将 AutoCAD 生成的 `acad.err` 保留并移入 `diagnostics/accoreconsole-acad.err`；修正旧 smoke 脚本的输出路径为 `net8.0`。
 - [x] 最终回归：`dotnet build --no-restore` 通过（0 错误、3 个 AutoCAD 依赖解析警告）；静态检查通过；最终输出无 Autodesk Managed DLL。
 - [ ] 宿主层 NETLOAD/100 次 `CADPM_HEALTH`/完整生命周期验收；等待修复 AutoCAD `AcGeomentObj.dbx` 宿主错误后继续。
-- [x] 已绑定远程 `https://github.com/jiaweixi-ops/cad.git`，确认远程 `main` 只有初始 README 提交；待提交并推送 V0.1。
+- [x] 已绑定远程 `https://github.com/jiaweixi-ops/cad.git`，V0.1 已提交并推送到 `main`，初始提交为 `97a644a`。
 - [x] 静态 V0.1 检查通过；一次 PowerShell 反射检查因字符串插值冒号语法失败，已改为重跑，未修改项目文件。
 - [x] 在 `.tools/` 安装隔离的 .NET SDK 8.0.424，供本项目构建验证使用（已通过 `.gitignore` 排除）。
 - [x] 记录首次 `--no-restore` 构建失败：仅因首次还原尚未生成资产文件。
