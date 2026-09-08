@@ -9,11 +9,11 @@ namespace CADProjectManager.AutoCAD
     {
         public static void Execute(string commandName, Action<Editor> action)
         {
-            var document = Application.DocumentManager.MdiActiveDocument;
-            var editor = document == null ? null : document.Editor;
-
             try
             {
+                var document = Application.DocumentManager.MdiActiveDocument;
+                var editor = document == null ? null : document.Editor;
+
                 if (editor == null)
                 {
                     BootstrapLogger.Info(commandName + " skipped: no active document.");
@@ -24,14 +24,27 @@ namespace CADProjectManager.AutoCAD
             }
             catch (Exception exception)
             {
-                BootstrapLogger.Error(commandName + " failed.", exception);
                 try
                 {
-                    editor.WriteMessage("\nCAD Project Manager: command failed safely. See the plugin log for details.");
+                    BootstrapLogger.Error(commandName + " failed.", exception);
                 }
                 catch
                 {
-                    // The exception boundary must not leak into AutoCAD.
+                    // Logging failures must never escape the command boundary.
+                }
+
+                try
+                {
+                    var document = Application.DocumentManager.MdiActiveDocument;
+                    var editor = document == null ? null : document.Editor;
+                    if (editor != null)
+                    {
+                        editor.WriteMessage("\nCAD Project Manager: command failed safely. See the plugin log for details.");
+                    }
+                }
+                catch
+                {
+                    // Never allow recovery/reporting code to leak an exception into AutoCAD.
                 }
             }
         }
