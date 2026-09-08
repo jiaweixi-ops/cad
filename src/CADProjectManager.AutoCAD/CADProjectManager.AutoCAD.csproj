@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>CADProjectManager.AutoCAD</AssemblyName>
+    <RootNamespace>CADProjectManager.AutoCAD</RootNamespace>
+    <Version>0.1.0</Version>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Deterministic>true</Deterministic>
+    <AutoCADManagedApiDir Condition="'$(AutoCADManagedApiDir)' == ''">$(AUTOCAD_MANAGED_API_DIR)</AutoCADManagedApiDir>
+    <AutoCADManagedApiDir Condition="'$(AutoCADManagedApiDir)' == '' and Exists('D:\Autodesk\CAD2025\AutoCAD 2025\acmgd.dll')">D:\Autodesk\CAD2025\AutoCAD 2025</AutoCADManagedApiDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AcMgd">
+      <HintPath>$(AutoCADManagedApiDir)\acmgd.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="AcDbMgd">
+      <HintPath>$(AutoCADManagedApiDir)\acdbmgd.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="AcCoreMgd">
+      <HintPath>$(AutoCADManagedApiDir)\accoremgd.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CADProjectManager.Core\CADProjectManager.Core.csproj" />
+    <ProjectReference Include="..\CADProjectManager.Infrastructure\CADProjectManager.Infrastructure.csproj" />
+  </ItemGroup>
+  <Target Name="RequireAutoCADManagedApi" BeforeTargets="ResolveReferences" Condition="!Exists('$(AutoCADManagedApiDir)\acmgd.dll') Or !Exists('$(AutoCADManagedApiDir)\acdbmgd.dll') Or !Exists('$(AutoCADManagedApiDir)\accoremgd.dll')">
+    <Error Text="AutoCAD 2025 Managed API not found. Set AUTOCAD_MANAGED_API_DIR to the real AutoCAD Managed API directory; Autodesk DLLs are required at build time and must not be copied into output." />
+  </Target>
+</Project>
