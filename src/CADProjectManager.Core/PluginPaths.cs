@@ -10,6 +10,14 @@ namespace CADProjectManager.Core
             get
             {
                 var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+                // Path.Combine("", "CADProjectManager") is relative and could land in
+                // AutoCAD's current working directory. Never allow that fallback.
+                if (string.IsNullOrEmpty(localAppData) || !Path.IsPathRooted(localAppData))
+                {
+                    localAppData = Path.GetTempPath();
+                }
+
                 return Path.Combine(localAppData, "CADProjectManager");
             }
         }
