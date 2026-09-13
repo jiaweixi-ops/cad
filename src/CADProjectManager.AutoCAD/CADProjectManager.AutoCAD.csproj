@@ -9,7 +9,6 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Deterministic>true</Deterministic>
     <AutoCADManagedApiDir Condition="'$(AutoCADManagedApiDir)' == ''">$(AUTOCAD_MANAGED_API_DIR)</AutoCADManagedApiDir>
-    <AutoCADManagedApiDir Condition="'$(AutoCADManagedApiDir)' == '' and Exists('D:\Autodesk\CAD2025\AutoCAD 2025\acmgd.dll')">D:\Autodesk\CAD2025\AutoCAD 2025</AutoCADManagedApiDir>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AcMgd">
@@ -30,6 +29,6 @@
     <ProjectReference Include="..\CADProjectManager.Infrastructure\CADProjectManager.Infrastructure.csproj" />
   </ItemGroup>
   <Target Name="RequireAutoCADManagedApi" BeforeTargets="ResolveReferences" Condition="!Exists('$(AutoCADManagedApiDir)\acmgd.dll') Or !Exists('$(AutoCADManagedApiDir)\acdbmgd.dll') Or !Exists('$(AutoCADManagedApiDir)\accoremgd.dll')">
-    <Error Text="AutoCAD 2025 Managed API not found. Set AUTOCAD_MANAGED_API_DIR to the real AutoCAD Managed API directory; Autodesk DLLs are required at build time and must not be copied into output." />
+    <Error Text="AutoCAD 2025 Managed API not found. Set AUTOCAD_MANAGED_API_DIR or AutoCADManagedApiDir to the real AutoCAD Managed API directory; Autodesk DLLs are required at build time and must not be copied into output." />
   </Target>
 </Project>
