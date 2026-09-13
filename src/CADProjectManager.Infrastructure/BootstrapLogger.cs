@@ -8,6 +8,7 @@ namespace CADProjectManager.Infrastructure
     public static class BootstrapLogger
     {
         private static readonly object Sync = new object();
+        private static readonly Encoding LogEncoding = new UTF8Encoding(false);
         private static bool _initialized;
         private static string _logPath;
 
@@ -53,13 +54,28 @@ namespace CADProjectManager.Infrastructure
 
         public static void Error(string message, Exception exception)
         {
-            var details = exception == null ? message : message + " | " + exception;
-            Write("ERROR", details);
+            if (exception == null)
+            {
+                Write("ERROR", message);
+                return;
+            }
+
+            Write("ERROR", Collapse((message ?? string.Empty) + " | " + exception));
         }
 
         public static void Flush()
         {
             // Each record is appended and closed synchronously. There is no background writer to flush.
+        }
+
+        private static string Collapse(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return string.Empty;
+            }
+
+            return text.Replace("\r\n", "\\n").Replace("\n", "\\n").Replace("\r", "\\n");
         }
 
         private static void Write(string level, string message)
@@ -68,9 +84,17 @@ namespace CADProjectManager.Infrastructure
             {
                 lock (Sync)
                 {
-                    if (!_initialized || string.IsNullOrEmpty(_logPath))
+                    if (!_initialized)
                     {
                         return;
+                    }
+
+                    // AutoCAD sessions may remain open across midnight; rotate to the current local date.
+                    var current = PluginPaths.LogFileFor(DateTime.Now);
+                    if (!string.Equals(_logPath, current, StringComparison.OrdinalIgnoreCase))
+                    {
+                        Directory.CreateDirectory(PluginPaths.LogsDirectory);
+                        _logPath = current;
                     }
 
                     WriteLineUnsafe(level, message);
@@ -92,7 +116,7 @@ namespace CADProjectManager.Infrastructure
                 "Infrastructure",
                 message ?? string.Empty,
                 Environment.NewLine);
-            File.AppendAllText(_logPath, line, Encoding.UTF8);
+            File.AppendAllText(_logPath, line, LogEncoding);
         }
     }
 }
