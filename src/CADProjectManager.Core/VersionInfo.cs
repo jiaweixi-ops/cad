@@ -4,6 +4,6 @@ namespace CADProjectManager.Core
     {
         public const string ProductName = "CAD Project Manager";
         public const string ProductVersion = "0.1.0";
-        public const string SafeMode = "SAFE MODE";
+        public const string BuildLabel = "SAFE MODE";
     }
 }
