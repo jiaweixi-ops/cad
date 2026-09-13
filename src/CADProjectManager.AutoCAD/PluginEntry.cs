@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Reflection;
 using Autodesk.AutoCAD.ApplicationServices.Core;
 using Autodesk.AutoCAD.EditorInput;
@@ -16,7 +17,7 @@ namespace CADProjectManager.AutoCAD
             {
                 // V0.1 deliberately performs no document, database, UI, network, event, or background work here.
                 BootstrapLogger.Initialize();
-                BootstrapLogger.Info("AutoCAD adapter initialized in " + VersionInfo.SafeMode + ".");
+                BootstrapLogger.Info("AutoCAD adapter initialized with build label " + VersionInfo.BuildLabel + ".");
             }
             catch
             {
@@ -47,7 +48,7 @@ namespace CADProjectManager.AutoCAD
                 editor.WriteMessage("\nVersion: " + VersionInfo.ProductVersion);
                 editor.WriteMessage("\nAutoCAD: " + SafeAutoCadVersion());
                 editor.WriteMessage("\nRuntime: " + Environment.Version);
-                editor.WriteMessage("\nMode: " + VersionInfo.SafeMode);
+                editor.WriteMessage("\nBuild label: " + VersionInfo.BuildLabel);
             });
         }
 
@@ -62,9 +63,24 @@ namespace CADProjectManager.AutoCAD
                 editor.WriteMessage("\nAutoCAD: " + SafeAutoCadVersion());
                 editor.WriteMessage("\n.NET runtime: " + Environment.Version);
                 editor.WriteMessage("\nPlugin path: " + GetPluginPath());
-                editor.WriteMessage("\nConfig path: " + PluginPaths.ConfigDirectory);
-                editor.WriteMessage("\nLog path: " + BootstrapLogger.LogPath);
+                editor.WriteMessage("\nConfig path: " + DescribePath(PluginPaths.ConfigDirectory));
+                editor.WriteMessage("\nLog path: " + (BootstrapLogger.IsAvailable
+                    ? BootstrapLogger.LogPath
+                    : "unavailable - logging is disabled"));
             });
+        }
+
+        private static string DescribePath(string path)
+        {
+            try
+            {
+                return Directory.Exists(path) ? path : path + " (not created yet)";
+            }
+            catch (System.Exception exception)
+            {
+                BootstrapLogger.Error("Unable to inspect path " + path + ".", exception);
+                return "unavailable";
+            }
         }
 
         private static string SafeAutoCadVersion()
